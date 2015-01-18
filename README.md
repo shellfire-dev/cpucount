@@ -4,6 +4,10 @@ This module provides utility functions for counting cpus to a [shellfire] applic
 
 An example user is the [cmake-scripted] tool.
 
+## Compatibility
+
+* Tag [`release_2015.0117.1750-1`](https://github.com/shellfire-dev/cpucount/releases/tag/release_2015.0117.1750-1) is compatible with [shellfire] release [`release_2015.0117.1750-1`](https://github.com/shellfire-dev/shellfire/releases/tag/release_2015.0117.1750-1).
+
 ## Overview
 
 To find the number of hyperthreaded CPUs on a system:
