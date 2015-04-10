@@ -3,21 +3,40 @@
 
 
 # Finds number of hyperthreaded CPUs (ie double number of CPUs) - ignores cpuset, etc
-core_dependency_requires '*' grep
+core_dependency_requires '*' grep uname
 # core_dependency_requires macosx
 cpucount_findNumberOfHyperthreadedCpus()
 {
-	# Should work under Linux and Cygwin
-	if [ -f /proc/cpuinfo ]; then
-		cpucount_discoveredNumberOfCpus="$(grep --extended-regexp --count '^processor[[:space:]]*:[[:space:]]' /proc/cpuinfo)"
+	# Windows, eg Msys
+	if [ -n "$NUMBER_OF_PROCESSORS" ]; then
+		printf '%s' "$NUMBER_OF_PROCESSORS"
 		return 0
 	fi
 	
-	# Windows, eg Msys
-	if [ -z "$NUMBER_OF_PROCESSORS" ]; then
-		cpucount_discoveredNumberOfCpu="$NUMBER_OF_PROCESSORS"
+	# Should work under Linux and Cygwin
+	if [ -f /proc/cpuinfo ]; then
+		grep --extended-regexp --count '^processor[[:space:]]*:[[:space:]]' /proc/cpuinfo)
 		return 0
 	fi
+	
+	local os="$(uname)"
+	case "$os" in
+		
+		Darwin)
+	 		# machdep.cpu.core_count is number of CPUs
+	 		# In practice, all modern Macs are hyperthreaded
+			sysctl -n machdep.cpu.thread_count
+		;;
+		
+		FreeBSD)
+			sysctl -n hw.ncpu
+		;;
+		
+		*)
+			core_message NOTICE "Could not determine hyperthreaded CPU count for your operating system '$os'"
+		;;
+		
+	esac
 }
 
 cpucount_computeMakeJobsAndLoadAverage()
@@ -25,7 +44,7 @@ cpucount_computeMakeJobsAndLoadAverage()
 	# converts strings to 0, ie 'max' goes to 0
 	local configuredCpuCount=$1
 	local configuredLoadAverageCorrection=$2
-	cpucount_findNumberOfHyperthreadedCpus
+	local cpucount_discoveredNumberOfCpus="$(cpucount_findNumberOfHyperthreadedCpus)"
 	
 	if [ $configuredCpuCount -eq 0 ]; then
 		cpucount_makeJobs=$cpucount_discoveredNumberOfCpus
