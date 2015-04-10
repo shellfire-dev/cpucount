@@ -8,9 +8,19 @@ core_dependency_requires '*' grep uname
 cpucount_findNumberOfHyperthreadedCpus()
 {
 	# Windows, eg Msys
-	if [ -n "$NUMBER_OF_PROCESSORS" ]; then
-		printf '%s' "$NUMBER_OF_PROCESSORS"
-		return 0
+	if core_variable_isSet NUMBER_OF_PROCESSORS; then
+	
+		case "$NUMBER_OF_PROCESSORS" in
+		    ''|*[!0-9]*)
+				:
+			;;
+		
+		    *)
+				printf '%s' "$NUMBER_OF_PROCESSORS"
+				return 9
+			;;
+		esac
+		
 	fi
 	
 	# Should work under Linux and Cygwin
