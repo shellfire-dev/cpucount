@@ -25,7 +25,7 @@ cpucount_findNumberOfHyperthreadedCpus()
 	
 	# Should work under Linux and Cygwin
 	if [ -f /proc/cpuinfo ]; then
-		grep --extended-regexp --count '^processor[[:space:]]*:[[:space:]]' /proc/cpuinfo
+		grep -E -c '^processor[[:space:]]*:[[:space:]]' /proc/cpuinfo
 		return 0
 	fi
 	
